@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>每日任务领取-从赚小钱开始</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 5px solid #FFD700;
+        }
+        
+        /* 新增样式：参数显示区域 */
+        .param-info {
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            border-bottom: 2px solid #FFD700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .param-info i {
+            font-size: 16px;
+        }
+        
+        .param-badge {
+            background: #FFD700;
+            color: #333;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 900;
+            margin-left: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        /* 导航页样式 */
+        .navigation-header {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .navigation-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: headerShine 4s infinite linear;
+        }
+        
+        @keyframes headerShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .navigation-header h1 {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .navigation-header .subtitle {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #FFD700;
+            position: relative;
+        }
+        
+        .navigation-header .tagline {
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+        
+        .navigation-content {
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            background: linear-gradient(to bottom, #FFF5F7, #FFFFFF);
+        }
+        
+        .task-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .task-button {
+            width: 100%;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            text-decoration: none;
+            color: white;
+            font-weight: 900;
+            font-size: 22px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+            animation: buttonShine 3s infinite linear;
+        }
+        
+        @keyframes buttonShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .task-button:hover, .task-button:active {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+        }
+        
+        .task-button.douyin {
+            background: linear-gradient(135deg, #FE2C55 0%, #25F4EE 100%);
+        }
+        
+        .task-button.wechat {
+            background: linear-gradient(135deg, #07C160 0%, #04A84E 100%);
+        }
+        
+        .task-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        
+        /* 固定返回按钮样式 */
+        .fixed-back-button {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 2px solid #FFD700;
+        }
+        
+        .fixed-back-button:hover, .fixed-back-button:active {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.6);
+        }
+        
+        /* 二维码区域样式 */
+        .qr-code-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 2px solid #dee2e6;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .qr-code-section .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .qr-code-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .qr-code-placeholder {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed #adb5bd;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            padding: 8px;
+        }
+        
+        .qr-code-placeholder img {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        
+        .qr-code-text {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .qr-code-text p {
+            margin-bottom: 8px;
+        }
+        
+        .qr-code-note {
+            font-size: 14px;
+            color: #FE2C55;
+            font-weight: 700;
+            margin-top: 12px;
+            padding: 8px 15px;
+            background: rgba(254, 44, 85, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #FE2C55;
+        }
+        
+        /* 页面通用样式 */
+        .page-header {
+            background: linear-gradient(to right, #FE2C55, #25F4EE, #FE2C55);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header.wechat {
+            background: linear-gradient(to right, #07C160, #04A84E, #027D3A);
+        }
+        
+        .page-header h1 {
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .page-content {
+            padding: 20px;
+            background: linear-gradient(to bottom, #FFF5F7, #FFFFFF);
+            height: 100%;
+            position: relative;
+        }
+        
+        /* 信誉保障区域 */
+        .trust-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .trust-badge {
+            background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            border-radius: 50px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border: 2px solid #FFD700;
+            flex: 1;
+            min-width: 45%;
+            max-width: 48%;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .trust-badge i {
+            color: #07C160;
+            font-size: 16px;
+        }
+        
+        /* 移动端优化样式 */
+        .mobile-optimized {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .mobile-section {
+            background: #FFF5F7;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(254, 44, 85, 0.08);
+            border: 2px solid #FFE4E8;
+        }
+        
+        .mobile-section-title {
+            font-size: 20px;
+            color: #FE2C55;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FFE4E8;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mobile-section-title i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .mobile-section.wechat {
+            background: #F8FFF8;
+            border-color: #E8F8EF;
+        }
+        
+        .mobile-section-title.wechat {
+            color: #07C160;
+            border-bottom-color: #E8F8EF;
+        }
+        
+        .req-item-mobile {
+            display: flex;
+            align-items: flex-start;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(254, 44, 85, 0.05);
+            margin-bottom: 12px;
+        }
+        
+        .req-item-mobile.warning {
+            border-left: 5px solid #FF6B35;
+            background: #FFF8F5;
+        }
+        
+        .req-icon-mobile {
+            color: #25F4EE;
+            font-size: 20px;
+            margin-right: 12px;
+            min-width: 24px;
+        }
+        
+        .req-item-mobile.warning .req-icon-mobile {
+            color: #FF6B35;
+        }
+        
+        .req-text-mobile h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 6px;
+            font-weight: 800;
+        }
+        
+        .req-text-mobile p {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .income-card-mobile {
+            background: linear-gradient(135deg, #FE2C55, #25F4EE);
+            color: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(254, 44, 85, 0.15);
+            margin-bottom: 15px;
+        }
+        
+        .income-card-mobile.wechat {
+            background: linear-gradient(135deg, #07C160, #04A84E);
+        }
+        
+        .income-amount-mobile {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        
+        .income-desc-mobile {
+            font-size: 16px;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+        
+        .five-day-income-mobile {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .day-income-mobile {
+            background: white;
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            box-shadow: 0 3px 8px rgba(254, 44, 85, 0.1);
+            border: 2px solid #FFE4E8;
+            flex: 1;
+        }
+        
+        .day-number-mobile {
+            font-size: 14px;
+            font-weight: 800;
+            color: #FE2C55;
+            margin-bottom: 6px;
+        }
+        
+        .day-amount-mobile {
+            font-size: 18px;
+            font-weight: 900;
+            color: #333;
+        }
+        
+        .total-income-mobile {
+            background: linear-gradient(135deg, #FE2C55, #25F4EE);
+            color: white;
+            border-radius: 15px;
+            padding: 18px;
+            text-align: center;
+            margin-top: 12px;
+            font-weight: 900;
+            font-size: 20px;
+        }
+        
+        .total-income-mobile.wechat {
+            background: linear-gradient(135deg, #07C160, #04A84E);
+        }
+        
+        .play-reward-mobile {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+            border: 4px solid #FE2C55;
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        .play-reward-mobile.wechat {
+            border-color: #07C160;
+        }
+        
+        .play-title-mobile {
+            font-size: 20px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #FE2C55;
+        }
+        
+        .play-title-mobile.wechat {
+            color: #07C160;
+        }
+        
+        .play-details-mobile {
+            font-size: 22px;
+            line-height: 1.3;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .play-note-mobile {
+            font-size: 16px;
+            font-weight: 800;
+            color: #FE2C55;
+        }
+        
+        .play-note-mobile.wechat {
+            color: #07C160;
+        }
+        
+        /* 任务步骤 - 下滑查看样式 */
+        .steps-vertical-container {
+            position: relative;
+        }
+        
+        .steps-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .steps-vertical::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .steps-vertical::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .steps-vertical::-webkit-scrollbar-thumb {
+            background: #FE2C55;
+            border-radius: 10px;
+        }
+        
+        .steps-vertical.wechat::-webkit-scrollbar-thumb {
+            background: #07C160;
+        }
+        
+        .step-vertical {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 15px;
+            box-shadow: 0 4px 10px rgba(254, 44, 85, 0.08);
+            border: 2px solid #FFE4E8;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-height: 80px;
+        }
+        
+        .step-vertical.wechat {
+            border-color: #E8F8EF;
+        }
+        
+        .step-vertical.highlight {
+            background: linear-gradient(135deg, #FE2C55, #25F4EE);
+            color: white;
+            border: none;
+        }
+        
+        .step-vertical.highlight.wechat {
+            background: linear-gradient(135deg, #07C160, #04A84E);
+        }
+        
+        .step-number-vertical {
+            font-size: 22px;
+            font-weight: 900;
+            color: #25F4EE;
+            height: 45px;
+            width: 45px;
+            line-height: 45px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(254, 44, 85, 0.1);
+            flex-shrink: 0;
+        }
+        
+        .step-vertical.highlight .step-number-vertical {
+            color: #FE2C55;
+        }
+        
+        .step-vertical.highlight.wechat .step-number-vertical {
+            color: #07C160;
+        }
+        
+        .step-name-vertical {
+            font-size: 15px;
+            line-height: 1.4;
+            font-weight: 700;
+        }
+        
+        /* 下滑提示 */
+        .scroll-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+            animation: hintBounce 2s infinite;
+        }
+        
+        .scroll-hint i {
+            font-size: 20px;
+            margin-bottom: 5px;
+            color: #FE2C55;
+        }
+        
+        .scroll-hint.wechat i {
+            color: #07C160;
+        }
+        
+        @keyframes hintBounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(-3px);
+            }
+        }
+        
+        .multi-account-mobile {
+            background: linear-gradient(to right, #F0F9FF, #FFF5F7);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            border: 2px dashed #25F4EE;
+            margin-top: 10px;
+        }
+        
+        .multi-account-mobile.wechat {
+            background: linear-gradient(to right, #F0F9F5, #FFF8F5);
+            border-color: #07C160;
+        }
+        
+        .multi-account-mobile strong {
+            color: #FE2C55;
+            font-size: 17px;
+        }
+        
+        .multi-account-mobile.wechat strong {
+            color: #07C160;
+        }
+        
+        .rules-list-mobile {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .rules-list-mobile p {
+            margin-bottom: 10px;
+            padding-left: 15px;
+            border-left: 3px solid #25F4EE;
+        }
+        
+        .rules-list-mobile.wechat p {
+            border-left-color: #07C160;
+        }
+        
+        .severe-warning-mobile {
+            background: linear-gradient(to right, #FE2C55, #FF6B35);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 3px solid #FF3B00;
+            box-shadow: 0 8px 20px rgba(254, 44, 85, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .severe-warning-mobile.wechat {
+            background: linear-gradient(to right, #FF6B35, #FF8E53);
+        }
+        
+        .warning-title-mobile {
+            font-size: 18px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #FFF;
+        }
+        
+        .warning-content-mobile {
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .warning-content-mobile p {
+            margin-bottom: 10px;
+        }
+        
+        .warning-highlight-mobile {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: 800;
+            font-size: 16px;
+            border-left: 4px solid #FF3B00;
+        }
+        
+        @keyframes pulse {
+            0% { 
+                transform: scale(1); 
+                box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+                border-color: #FE2C55;
+            }
+            50% { 
+                transform: scale(1.02); 
+                box-shadow: 0 10px 25px rgba(255, 215, 0, 0.6);
+                border-color: #FFD700;
+            }
+            100% { 
+                transform: scale(1); 
+                box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+                border-color: #FE2C55;
+            }
+        }
+        
+        /* 加载指示器 */
+        .qr-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+        }
+        
+        .qr-loading i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #FE2C55;
+        }
+        
+        /* 二维码错误提示 */
+        .qr-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .qr-error i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #FF6B35;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 360px) {
+            .trust-badge {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+            
+            .task-button {
+                height: 120px;
+                font-size: 20px;
+            }
+            
+            .task-icon {
+                font-size: 32px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+            
+            .trust-badges {
+                gap: 15px;
+            }
+            
+            .trust-badge {
+                min-width: auto;
+                max-width: none;
+                flex: none;
+            }
+            
+            .steps-vertical {
+                max-height: 300px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 固定返回按钮（初始隐藏） -->
+    <a href="#" id="fixed-back-btn" class="fixed-back-button" style="display: none;" onclick="showPage('navigation-page')">
+        <i class="fas fa-arrow-left"></i> 返回选择任务
+    </a>
+    
+    <!-- 总导航页 -->
+    <div id="navigation-page" class="container">
+        <!-- 新增：URL参数显示区域 -->
+        <div id="param-info-section" class="param-info" style="display: none;">
+            <i class="fas fa-link"></i>
+            <span>当前链接参数: </span>
+            <span id="current-param" class="param-badge">1</span>
+            <span id="param-desc">(使用第1组二维码)</span>
+        </div>
+        
+        <div class="navigation-header">
+            <h1>任务选择系统</h1>
+            <div class="subtitle">专业代发8年 · 信誉可靠 · 安全有保障</div>
+            <div class="tagline">
+                <i class="fas fa-tasks"></i>
+                <span>选择任务类型 · 开始赚钱之旅</span>
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+        
+        <div class="navigation-content">
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    专业代发8年
+                </div>
+                <div class="trust-badge">
+                    <i class="fas fa-medal"></i>
+                    信誉可靠
+                </div>
+                <div class="trust-badge">
+                    <i class="fas fa-lock"></i>
+                    安全有保障
+                </div>
+                <div class="trust-badge">
+                    <i class="fas fa-user-shield"></i>
+                    无需实名
+                </div>
+                <div class="trust-badge">
+                    <i class="fas fa-ban"></i>
+                    不封号
+                </div>
+            </div>
+            
+            <div class="task-selection">
+                <a href="#" class="task-button douyin" onclick="showPage('douyin-page')">
+                    <i class="fas fa-play-circle task-icon"></i>
+                    抖音代发任务
+                </a>
+                
+                <a href="#" class="task-button wechat" onclick="showPage('wechat-page')">
+                    <i class="fab fa-weixin task-icon"></i>
+                    视频号代发任务
+                </a>
+            </div>
+            
+            <div class="instructions">
+                <h3 style="text-align: center; color: #666; margin-bottom: 15px; font-size: 16px;">
+                    <i class="fas fa-info-circle"></i> 选择任务类型开始赚钱
+                </h3>
+                <p style="text-align: center; color: #888; font-size: 14px; line-height: 1.4;">
+                    根据您的账号情况选择合适的任务类型<br>每种任务都有详细的规则说明
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 抖音任务页面 -->
+    <div id="douyin-page" class="container" style="display: none;">
+        <!-- 新增：URL参数显示区域 -->
+        <div id="douyin-param-info" class="param-info" style="display: none;">
+            <i class="fas fa-link"></i>
+            <span>当前链接参数: </span>
+            <span id="douyin-current-param" class="param-badge">1</span>
+            <span id="douyin-param-desc">(使用第1组二维码)</span>
+        </div>
+        
+        <div class="page-header">
+            <h1>抖音发布任务规则</h1>
+            <div class="tagline">
+                <i class="fas fa-mobile-alt"></i>
+                <span>每天5分钟 · 多号收入叠加</span>
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+        
+        <div class="page-content">
+            <div class="mobile-optimized">
+                <!-- 任务要求 -->
+                <div class="mobile-section">
+                    <div class="mobile-section-title">
+                        <i class="fas fa-clipboard-list"></i> 任务要求
+                    </div>
+                    
+                    <div class="req-item-mobile">
+                        <div class="req-icon-mobile"><i class="fas fa-user-check"></i></div>
+                        <div class="req-text-mobile">
+                            <h3>账号正常即可</h3>
+                            <p>账号状态正常即可参与，不会看教程也能操作</p>
+                        </div>
+                    </div>
+                    
+                    <div class="req-item-mobile warning">
+                        <div class="req-icon-mobile"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="req-text-mobile">
+                            <h3>发布限制</h3>
+                            <p>必须保证发布视频后不能删除视频、隐藏视频，在做任务期间不能发布别的视频</p>
+                        </div>
+                    </div>
+                    
+                    <div class="req-item-mobile">
+                        <div class="req-icon-mobile"><i class="fas fa-clock"></i></div>
+                        <div class="req-text-mobile">
+                            <h3>时间要求</h3>
+                            <p>每天5分钟，有手机就能做，多号收入叠加</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 收益详情 -->
+                <div class="mobile-section">
+                    <div class="mobile-section-title">
+                        <i class="fas fa-money-bill-wave"></i> 收益详情
+                    </div>
+                    
+                    <div class="income-card-mobile">
+                        <div class="income-amount-mobile">10元/天</div>
+                        <div class="income-desc-mobile">每天10元，次日结账，连发5天共50元</div>
+                        <div class="income-desc-mobile">中途必须保证视频不删除、不隐藏、不发布其他视频</div>
+                    </div>
+                    
+                    <div class="five-day-income-mobile">
+                        <div class="day-income-mobile">
+                            <div class="day-number-mobile">第1天</div>
+                            <div class="day-amount-mobile">10元</div>
+                        </div>
+                        <div class="day-income-mobile">
+                            <div class="day-number-mobile">第2天</div>
+                            <div class="day-amount-mobile">10元</div>
+                        </div>
+                        <div class="day-income-mobile">
+                            <div class="day-number-mobile">第3天</div>
+                            <div class="day-amount-mobile">10元</div>
+                        </div>
+                        <div class="day-income-mobile">
+                            <div class="day-number-mobile">第4天</div>
+                            <div class="day-amount-mobile">10元</div>
+                        </div>
+                        <div class="day-income-mobile">
+                            <div class="day-number-mobile">第5天</div>
+                            <div class="day-amount-mobile">10元</div>
+                        </div>
+                    </div>
+                    
+                    <div class="total-income-mobile">
+                        连续5天总收益：50元
+                    </div>
+                    
+                    <div style="font-size: 14px; color: #666; line-height: 1.4; margin-top: 15px; padding: 12px; background: #F8F8F8; border-radius: 10px;">
+                        <p><strong>收益说明：</strong></p>
+                        <p>1. 每天发布视频后，<strong>次日结账</strong>，当天收益10元</p>
+                        <p>2. 必须连续发布5天，<strong>总收益50元</strong></p>
+                        <p>3. 中途如有任何违规行为，<strong>当天收益不予结算</strong></p>
+                        <p>4. 连续5天无违规，获得全部50元收益</p>
+                    </div>
+                </div>
+                
+                <!-- 播放奖励 -->
+                <div class="play-reward-mobile">
+                    <div class="play-title-mobile">
+                        <i class="fas fa-play-circle"></i>
+                        <span>额外播放奖励</span>
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="play-details-mobile">1万播放=5元，2万播放=10元</div>
+                    <div class="play-note-mobile">（以此类推，多播多得！）</div>
+                </div>
+                
+                <!-- 任务步骤 - 下滑查看 -->
+                <div class="mobile-section">
+                    <div class="mobile-section-title">
+                        <i class="fas fa-list-ol"></i> 任务步骤（下滑查看）
+                    </div>
+                    
+                    <div class="steps-vertical-container">
+                        <div class="steps-vertical" id="douyin-steps">
+                            <div class="step-vertical">
+                                <div class="step-number-vertical">1</div>
+                                <div class="step-name-vertical">准备正常抖音账号，确保账号状态正常无异常</div>
+                            </div>
+                            
+                            <div class="step-vertical">
+                                <div class="step-number-vertical">2</div>
+                                <div class="step-name-vertical">获取任务视频素材，按照要求编辑视频内容</div>
+                            </div>
+                            
+                            <div class="step-vertical highlight">
+                                <div class="step-number-vertical">3</div>
+                                <div class="step-name-vertical">按要求发布视频，设置好标题、标签和封面</div>
+                            </div>
+                            
+                            <div class="step-vertical">
+                                <div class="step-number-vertical">4</div>
+                                <div class="step-name-vertical">保持视频24小时不删除、不隐藏、不发布其他视频</div>
+                            </div>
+                            
+                            <div class="step-vertical">
+                                <div class="step-number-vertical">5</div>
+                                <div class="step-name-vertical">次日联系客服结账，获取10元收益</div>
+                            </div>
+                            
+                            <div class="step-vertical">
+                                <div class="step-number-vertical">6</div>
+                                <div class="step-name-vertical">连续发布5天，每天重复上述步骤</div>
+                            </div>
+                            
+                            <div class="step-vertical">
+                                <div class="step-number-vertical">7</div>
+                                <div class="step-name-vertical">5天后获得总收益50元，如有播放量额外奖励</div>
+                            </div>
+                        </div>
+                        
+                        <div class="scroll-hint">
+                            <i class="fas fa-chevron-down"></i>
+                            <span>下滑查看所有步骤</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 多账号提示 -->
+                <div class="multi-account-mobile">
+                    <i class="fas fa-users"></i> 
+                    <strong>支持多账号同时操作，收益可叠加</strong>
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                
+                <!-- 规则说明 -->
+                <div class="mobile-section">
+                    <div class="mobile-section-title">
+                        <i class="fas fa-info-circle"></i> 规则说明
+                    </div>
+                    <div class="rules-list-mobile">
+                        <p>1. 发布后24小时内不得删除、隐藏视频</p>
+                        <p>2. 任务期间不得发布其他视频</p>
+                        <p>3. 每天收益10元，次日结算</p>
+                        <p>4. 必须连续发布5天，总收益50元</p>
+                        <p>5. 违规者当天收益不予结算，并拉黑处理</p>
+                        <p>6. 播放奖励与每日收益一起结算</p>
+                    </div>
+                </div>
+                
+                <!-- 严重警告区域 -->
+                <div class="severe-warning-mobile">
+                    <div class="warning-title-mobile">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <span>重要警告！违规者勿扰！</span>
+                    </div>
+                    <div class="warning-content-mobile">
+                        <p>最近遇到太多发不了结账后立即删除视频，或者发布后隐藏视频，再接别人的单！</p>
+                        <p>这些狗比不要来做任务！</p>
+                        <div class="warning-highlight-mobile">
+                            必须保证发布视频后不能删除视频、隐藏视频，在做任务期间不能发布别的视频！
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 二维码区域 -->
+                <div class="qr-code-section">
+                    <div class="section-title">
+                        <i class="fas fa-qrcode"></i> 添加抖音客服微信
+                        <span id="douyin-qr-param-info" style="font-size: 14px; color: #666; margin-left: 10px;"></span>
+                    </div>
+                    <div class="qr-code-container">
+                        <div class="qr-code-placeholder" id="douyin-qr-container">
+                            <!-- 抖音客服二维码 -->
+                            <img src="http://x.nc0818.top/dy/1.jpg" alt="抖音客服二维码" id="douyin-qr" style="display: none;">
+                            <div class="qr-loading" id="douyin-qr-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <div>加载二维码中...</div>
+                            </div>
+                            <div class="qr-error" id="douyin-qr-error" style="display: none;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div>二维码加载失败</div>
+                                <div style="font-size: 12px; margin-top: 5px;">请稍后重试或联系客服</div>
+                            </div>
+                        </div>
+                        <div class="qr-code-text">
+                            <p>请扫描上方二维码添加客服微信</p>
+                            <p>添加时请备注"抖音任务"</p>
+                            <p>客服将为您提供详细的任务指导</p>
+                        </div>
+                        <div class="qr-code-note">
+                            添加好友后，请发送"抖音任务"开始接单
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 视频号任务页面 -->
+    <div id="wechat-page" class="container" style="display: none;">
+        <!-- 新增：URL参数显示区域 -->
+        <div id="wechat-param-info" class="param-info" style="display: none;">
+            <i class="fas fa-link"></i>
+            <span>当前链接参数: </span>
+            <span id="wechat-current-param" class="param-badge">1</span>
+            <span id="wechat-param-desc">(使用第1组二维码)</span>
+        </div>
+        
+        <div class="page-header wechat">
+            <h1>视频号发布任务规则</h1>
+            <div class="tagline">
+                <i class="fas fa-mobile-alt"></i>
+                <span>每天5分钟 · 多号收入叠加</span>
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+        
+        <div class="page-content">
+            <div class="mobile-optimized">
+                <!-- 任务要求 -->
+                <div class="mobile-section wechat">
+                    <div class="mobile-section-title wechat">
+                        <i class="fas fa-clipboard-list"></i> 任务要求
+                    </div>
+                    
+                    <div class="req-item-mobile">
+                        <div class="req-icon-mobile" style="color: #07C160;"><i class="fas fa-user-check"></i></div>
+                        <div class="req-text-mobile">
+                            <h3>账号正常即可</h3>
+                            <p>账号状态正常即可参与，不会看教程也能操作</p>
+                        </div>
+                    </div>
+                    
+                    <div class="req-item-mobile warning">
+                        <div class="req-icon-mobile"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="req-text-mobile">
+                            <h3>发布限制</h3>
+                            <p>必须保证发布视频后不能删除视频、隐藏视频，在做任务期间不能发布别的视频</p>
+                        </div>
+                    </div>
+                    
+                    <div class="req-item-mobile">
+                        <div class="req-icon-mobile" style="color: #07C160;"><i class="fas fa-clock"></i></div>
+                        <div class="req-text-mobile">
+                            <h3>时间要求</h3>
+                            <p>每天5分钟，有手机就能做，多号收入叠加</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 收益详情 -->
+                <div class="mobile-section wechat">
+                    <div class="mobile-section-title wechat">
+                        <i class="fas fa-money-bill-wave"></i> 收益详情
+                    </div>
+                    
+                    <div class="income-card-mobile wechat">
+                        <div class="income-amount-mobile">15元</div>
+                        <div class="income-desc-mobile">发布后不结账，24小时后再结账</div>
+                        <div class="income-desc-mobile">中途必须保证视频不删除、不隐藏、不发布其他视频</div>
+                    </div>
+                    
+                    <div style="font-size: 16px; color: #666; text-align: center; background: #F0F9F5; padding: 12px; border-radius: 10px; border: 2px dashed #07C160; margin-top: 15px;">
+                        <strong style="color: #07C160; font-size: 18px;">保底收入：15元</strong>（24小时后，发布的视频无删除、无隐藏、无其他视频发布）
+                    </div>
+                    
+                    <div style="font-size: 14px; color: #666; line-height: 1.4; margin-top: 15px; padding: 12px; background: #F8F8F8; border-radius: 10px;">
+                        <p><strong>收益说明：</strong></p>
+                        <p>1. 发布视频后，<strong>不立即结账</strong>，需等待24小时</p>
+                        <p>2. 24小时后，如果视频没有删除或隐藏，且没有发布其他视频，结算<strong>15元</strong></p>
+                        <p>3. 如有任何违规行为，<strong>不予结算</strong></p>
+                    </div>
+                </div>
+                
+                <!-- 播放奖励 -->
+                <div class="play-reward-mobile wechat">
+                    <div class="play-title-mobile wechat">
+                        <i class="fas fa-play-circle"></i>
+                        <span>额外播放奖励</span>
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="play-details-mobile">1万播放=5元，2万播放=10元</div>
+                    <div class="play-note-mobile wechat">（以此类推，多播多得！）</div>
+                </div>
+                
+                <!-- 任务步骤 - 下滑查看 -->
+                <div class="mobile-section wechat">
+                    <div class="mobile-section-title wechat">
+                        <i class="fas fa-list-ol"></i> 任务步骤（下滑查看）
+                    </div>
+                    
+                    <div class="steps-vertical-container">
+                        <div class="steps-vertical wechat" id="wechat-steps">
+                            <div class="step-vertical wechat">
+                                <div class="step-number-vertical" style="color: #07C160;">1</div>
+                                <div class="step-name-vertical">准备正常视频号账号，确保账号状态正常无异常</div>
+                            </div>
+                            
+                            <div class="step-vertical wechat">
+                                <div class="step-number-vertical" style="color: #07C160;">2</div>
+                                <div class="step-name-vertical">获取任务视频素材，按照要求编辑视频内容</div>
+                            </div>
+                            
+                            <div class="step-vertical highlight wechat">
+                                <div class="step-number-vertical" style="color: #07C160;">3</div>
+                                <div class="step-name-vertical">按要求发布视频，设置好标题、标签和封面</div>
+                            </div>
+                            
+                            <div class="step-vertical wechat">
+                                <div class="step-number-vertical" style="color: #07C160;">4</div>
+                                <div class="step-name-vertical">保持视频24小时不删除、不隐藏、不发布其他视频</div>
+                            </div>
+                            
+                            <div class="step-vertical wechat">
+                                <div class="step-number-vertical" style="color: #07C160;">5</div>
+                                <div class="step-name-vertical">24小时后联系客服审核，确认无违规行为</div>
+                            </div>
+                            
+                            <div class="step-vertical wechat">
+                                <div class="step-number-vertical" style="color: #07C160;">6</div>
+                                <div class="step-name-vertical">审核通过后结算15元保底收益</div>
+                            </div>
+                            
+                            <div class="step-vertical wechat">
+                                <div class="step-number-vertical" style="color: #07C160;">7</div>
+                                <div class="step-name-vertical">如有播放量，额外计算播放奖励一并结算</div>
+                            </div>
+                        </div>
+                        
+                        <div class="scroll-hint wechat">
+                            <i class="fas fa-chevron-down"></i>
+                            <span>下滑查看所有步骤</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 多账号提示 -->
+                <div class="multi-account-mobile wechat">
+                    <i class="fas fa-users"></i> 
+                    <strong>支持多账号同时操作，收益可叠加</strong>
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                
+                <!-- 规则说明 -->
+                <div class="mobile-section wechat">
+                    <div class="mobile-section-title wechat">
+                        <i class="fas fa-info-circle"></i> 规则说明
+                    </div>
+                    <div class="rules-list-mobile wechat">
+                        <p>1. 发布后24小时内不得删除、隐藏视频</p>
+                        <p>2. 任务期间不得发布其他视频</p>
+                        <p>3. 违规者一律不予结算，并拉黑处理</p>
+                        <p>4. 播放奖励24小时后与保底收入一起结算</p>
+                    </div>
+                </div>
+                
+                <!-- 严重警告区域 -->
+                <div class="severe-warning-mobile wechat">
+                    <div class="warning-title-mobile">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <span>重要警告！违规者勿扰！</span>
+                    </div>
+                    <div class="warning-content-mobile">
+                        <p>最近遇到太多发不了结账后立即删除视频，或者发布后隐藏视频，再接别人的单！</p>
+                        <p>这些狗比不要来做任务！</p>
+                        <div class="warning-highlight-mobile">
+                            必须保证发布视频后不能删除视频、隐藏视频，在做任务期间不能发布别的视频！
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 二维码区域 -->
+                <div class="qr-code-section">
+                    <div class="section-title">
+                        <i class="fas fa-qrcode"></i> 添加视频号客服微信
+                        <span id="wechat-qr-param-info" style="font-size: 14px; color: #666; margin-left: 10px;"></span>
+                    </div>
+                    <div class="qr-code-container">
+                        <div class="qr-code-placeholder" id="wechat-qr-container">
+                            <!-- 视频号客服二维码 -->
+                            <img src="http://x.nc0818.top/sph/1.jpg" alt="视频号客服二维码" id="wechat-qr" style="display: none;">
+                            <div class="qr-loading" id="wechat-qr-loading">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <div>加载二维码中...</div>
+                            </div>
+                            <div class="qr-error" id="wechat-qr-error" style="display: none;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div>二维码加载失败</div>
+                                <div style="font-size: 12px; margin-top: 5px;">请稍后重试或联系客服</div>
+                            </div>
+                        </div>
+                        <div class="qr-code-text">
+                            <p>请扫描上方二维码添加客服微信</p>
+                            <p>添加时请备注"视频号任务"</p>
+                            <p>客服将为您提供详细的任务指导</p>
+                        </div>
+                        <div class="qr-code-note">
+                            添加好友后，请发送"视频号任务"开始接单
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 获取URL参数函数
+        function getUrlParam() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let param = null;
+            
+            // 遍历所有参数，找到第一个数字参数
+            for (const [key, value] of urlParams) {
+                // 如果参数没有键名（如?1），则key是空字符串，value是"1"
+                if (key === '' && /^\d+$/.test(value)) {
+                    param = parseInt(value);
+                    break;
+                }
+                // 或者参数名是数字（如?1=）
+                else if (/^\d+$/.test(key)) {
+                    param = parseInt(key);
+                    break;
+                }
+            }
+            
+            // 如果没有找到参数，检查整个查询字符串
+            if (param === null) {
+                const query = window.location.search.substring(1); // 去掉问号
+                if (/^\d+$/.test(query)) {
+                    param = parseInt(query);
+                }
+            }
+            
+            // 确保参数在1-10之间
+            if (param && param >= 1 && param <= 10) {
+                return param;
+            }
+            
+            // 默认返回1
+            return 1;
+        }
+        
+        // 全局变量存储当前参数
+        let currentParam = getUrlParam();
+        
+        // 显示参数信息
+        function showParamInfo() {
+            const paramInfo = document.getElementById('param-info-section');
+            const douyinParamInfo = document.getElementById('douyin-param-info');
+            const wechatParamInfo = document.getElementById('wechat-param-info');
+            
+            const currentParamElement = document.getElementById('current-param');
+            const douyinCurrentParam = document.getElementById('douyin-current-param');
+            const wechatCurrentParam = document.getElementById('wechat-current-param');
+            
+            const paramDesc = document.getElementById('param-desc');
+            const douyinParamDesc = document.getElementById('douyin-param-desc');
+            const wechatParamDesc = document.getElementById('wechat-param-desc');
+            
+            const douyinQrParamInfo = document.getElementById('douyin-qr-param-info');
+            const wechatQrParamInfo = document.getElementById('wechat-qr-param-info');
+            
+            if (currentParam !== 1) {
+                // 显示参数信息区域
+                paramInfo.style.display = 'flex';
+                douyinParamInfo.style.display = 'flex';
+                wechatParamInfo.style.display = 'flex';
+                
+                // 更新参数显示
+                currentParamElement.textContent = currentParam;
+                douyinCurrentParam.textContent = currentParam;
+                wechatCurrentParam.textContent = currentParam;
+                
+                // 更新参数描述
+                paramDesc.textContent = `(使用第${currentParam}组二维码)`;
+                douyinParamDesc.textContent = `(使用第${currentParam}组二维码)`;
+                wechatParamDesc.textContent = `(使用第${currentParam}组二维码)`;
+                
+                // 更新二维码区域的参数信息
+                if (douyinQrParamInfo) {
+                    douyinQrParamInfo.textContent = `(第${currentParam}组二维码)`;
+                }
+                if (wechatQrParamInfo) {
+                    wechatQrParamInfo.textContent = `(第${currentParam}组二维码)`;
+                }
+            } else {
+                // 如果参数是1（默认），隐藏参数信息区域
+                paramInfo.style.display = 'none';
+                douyinParamInfo.style.display = 'none';
+                wechatParamInfo.style.display = 'none';
+                
+                // 清除二维码区域的参数信息
+                if (douyinQrParamInfo) {
+                    douyinQrParamInfo.textContent = '';
+                }
+                if (wechatQrParamInfo) {
+                    wechatQrParamInfo.textContent = '';
+                }
+            }
+        }
+        
+        // 根据参数生成二维码路径
+        function getQRPath(type, param) {
+            // type: 'douyin' 或 'wechat'
+            // param: 1-10
+            
+            let basePath;
+            if (type === 'douyin') {
+                basePath = param === 1 ? 'dy' : `dy${param}`;
+            } else if (type === 'wechat') {
+                basePath = param === 1 ? 'sph' : `sph${param}`;
+            }
+            
+            return `http://x.nc0818.top/${basePath}/1.jpg`;
+        }
+        
+        // 页面切换函数
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.getElementById('navigation-page').style.display = 'none';
+            document.getElementById('douyin-page').style.display = 'none';
+            document.getElementById('wechat-page').style.display = 'none';
+            
+            // 显示选中的页面
+            document.getElementById(pageId).style.display = 'flex';
+            
+            // 控制固定返回按钮的显示
+            const fixedBackBtn = document.getElementById('fixed-back-btn');
+            if (pageId === 'navigation-page') {
+                fixedBackBtn.style.display = 'none';
+            } else {
+                fixedBackBtn.style.display = 'flex';
+            }
+            
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+            
+            // 加载对应页面的二维码
+            if (pageId === 'douyin-page') {
+                loadDouyinQR();
+                setupStepsAnimation('douyin-steps');
+            } else if (pageId === 'wechat-page') {
+                loadWechatQR();
+                setupStepsAnimation('wechat-steps');
+            }
+            
+            return false;
+        }
+        
+        // 初始化页面
+        window.onload = function() {
+            // 显示参数信息
+            showParamInfo();
+            
+            // 显示导航页
+            showPage('navigation-page');
+            
+            // 为移动端优化触摸体验
+            document.addEventListener('touchstart', function() {}, {passive: true});
+        };
+        
+        // 加载抖音二维码函数（修改为使用参数）
+        function loadDouyinQR() {
+            const douyinQR = document.getElementById('douyin-qr');
+            const douyinLoading = document.getElementById('douyin-qr-loading');
+            const douyinError = document.getElementById('douyin-qr-error');
+            
+            // 重置状态
+            douyinQR.style.display = 'none';
+            douyinLoading.style.display = 'flex';
+            douyinError.style.display = 'none';
+            
+            // 根据参数设置图片源
+            const qrPath = getQRPath('douyin', currentParam);
+            douyinQR.src = qrPath + "?" + new Date().getTime();
+            
+            // 图片加载成功
+            douyinQR.onload = function() {
+                douyinQR.style.display = 'block';
+                douyinLoading.style.display = 'none';
+                douyinError.style.display = 'none';
+            };
+            
+            // 图片加载失败
+            douyinQR.onerror = function() {
+                douyinQR.style.display = 'none';
+                douyinLoading.style.display = 'none';
+                douyinError.style.display = 'flex';
+            };
+        }
+        
+        // 加载视频号二维码函数（修改为使用参数）
+        function loadWechatQR() {
+            const wechatQR = document.getElementById('wechat-qr');
+            const wechatLoading = document.getElementById('wechat-qr-loading');
+            const wechatError = document.getElementById('wechat-qr-error');
+            
+            // 重置状态
+            wechatQR.style.display = 'none';
+            wechatLoading.style.display = 'flex';
+            wechatError.style.display = 'none';
+            
+            // 根据参数设置图片源
+            const qrPath = getQRPath('wechat', currentParam);
+            wechatQR.src = qrPath + "?" + new Date().getTime();
+            
+            // 图片加载成功
+            wechatQR.onload = function() {
+                wechatQR.style.display = 'block';
+                wechatLoading.style.display = 'none';
+                wechatError.style.display = 'none';
+            };
+            
+            // 图片加载失败
+            wechatQR.onerror = function() {
+                wechatQR.style.display = 'none';
+                wechatLoading.style.display = 'none';
+                wechatError.style.display = 'flex';
+            };
+        }
+        
+        // 设置步骤动画
+        function setupStepsAnimation(stepsId) {
+            const stepsContainer = document.getElementById(stepsId);
+            const scrollHint = stepsContainer.nextElementSibling;
+            
+            if (!stepsContainer || !scrollHint) return;
+            
+            // 监听滚动事件，用户滚动后隐藏提示
+            stepsContainer.addEventListener('scroll', function() {
+                if (this.scrollTop > 10) {
+                    scrollHint.style.opacity = '0';
+                    scrollHint.style.transition = 'opacity 0.5s ease';
+                } else {
+                    scrollHint.style.opacity = '1';
+                }
+            });
+            
+            // 初始显示步骤动画
+            const steps = stepsContainer.querySelectorAll('.step-vertical');
+            steps.forEach((step, index) => {
+                step.style.opacity = '0';
+                step.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    step.style.transition = 'all 0.5s ease';
+                    step.style.opacity = '1';
+                    step.style.transform = 'translateY(0)';
+                }, 100 + (index * 100));
+            });
+        }
+        
+        // 播放奖励交互效果
+        const playRewards = document.querySelectorAll('.play-reward-mobile');
+        playRewards.forEach(playReward => {
+            // 点击效果
+            playReward.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+        
+        // 警告区域闪烁效果
+        const severeWarnings = document.querySelectorAll('.severe-warning-mobile');
+        severeWarnings.forEach(severeWarning => {
+            setInterval(() => {
+                severeWarning.style.borderColor = severeWarning.style.borderColor === 'rgb(255, 59, 0)' 
+                    ? '#FFD700' 
+                    : '#FF3B00';
+                severeWarning.style.transition = 'border-color 0.5s ease';
+            }, 1000);
+        });
+        
+        // 卡片悬停效果（移动端用active替代hover）
+        const cards = document.querySelectorAll('.req-item-mobile, .step-vertical, .day-income-mobile');
+        cards.forEach(card => {
+            card.addEventListener('touchstart', function() {
+                if (!this.classList.contains('highlight') && !this.classList.contains('play-reward-mobile')) {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.transition = 'all 0.2s ease';
+                }
+            });
+            
+            card.addEventListener('touchend', function() {
+                if (!this.classList.contains('highlight') && !this.classList.contains('play-reward-mobile')) {
+                    this.style.transform = 'translateY(0)';
+                }
+            });
+        });
+        
+        // 防止图片长按保存
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        }, false);
+        
+        // 处理iOS Safari的100vh问题
+        function setAppHeight() {
+            const doc = document.documentElement;
+            doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+        }
+        
+        window.addEventListener('resize', setAppHeight);
+        window.addEventListener('orientationchange', setAppHeight);
+        setAppHeight();
+    </script>
+</body>
+</html>
