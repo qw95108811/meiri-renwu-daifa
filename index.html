@@ -34,35 +34,6 @@
             border: 5px solid #FFD700;
         }
         
-        /* 新增样式：参数显示区域 */
-        .param-info {
-            background: linear-gradient(to right, #4CAF50, #8BC34A);
-            color: white;
-            padding: 8px 15px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 700;
-            border-bottom: 2px solid #FFD700;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .param-info i {
-            font-size: 14px;
-        }
-        
-        .param-badge {
-            background: #FFD700;
-            color: #333;
-            padding: 2px 8px;
-            border-radius: 15px;
-            font-weight: 900;
-            margin: 0 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
         /* 导航页样式 */
         .navigation-header {
             background: linear-gradient(to right, #667eea, #764ba2);
@@ -856,14 +827,6 @@
     
     <!-- 总导航页 -->
     <div id="navigation-page" class="container">
-        <!-- 新增：参数显示区域 -->
-        <div id="param-display" class="param-info" style="display: none;">
-            <i class="fas fa-link"></i>
-            <span>当前参数:</span>
-            <span id="current-param" class="param-badge">1</span>
-            <span>(使用第<span id="param-number">1</span>组二维码)</span>
-        </div>
-        
         <div class="navigation-header">
             <h1>任务选择系统</h1>
             <div class="subtitle">专业代发8年 · 信誉可靠 · 安全有保障</div>
@@ -923,14 +886,6 @@
     
     <!-- 抖音任务页面 -->
     <div id="douyin-page" class="container" style="display: none;">
-        <!-- 新增：参数显示区域 -->
-        <div id="douyin-param-display" class="param-info" style="display: none;">
-            <i class="fas fa-link"></i>
-            <span>当前参数:</span>
-            <span id="douyin-current-param" class="param-badge">1</span>
-            <span>(使用第<span id="douyin-param-number">1</span>组二维码)</span>
-        </div>
-        
         <div class="page-header">
             <h1>抖音发布任务规则</h1>
             <div class="tagline">
@@ -1124,7 +1079,6 @@
                 <div class="qr-code-section">
                     <div class="section-title">
                         <i class="fas fa-qrcode"></i> 添加抖音客服微信
-                        <span id="douyin-param-info" style="font-size: 14px; color: #666; margin-left: 10px;"></span>
                     </div>
                     <div class="qr-code-container">
                         <div class="qr-code-placeholder" id="douyin-qr-container">
@@ -1156,14 +1110,6 @@
     
     <!-- 视频号任务页面 -->
     <div id="wechat-page" class="container" style="display: none;">
-        <!-- 新增：参数显示区域 -->
-        <div id="wechat-param-display" class="param-info" style="display: none;">
-            <i class="fas fa-link"></i>
-            <span>当前参数:</span>
-            <span id="wechat-current-param" class="param-badge">1</span>
-            <span>(使用第<span id="wechat-param-number">1</span>组二维码)</span>
-        </div>
-        
         <div class="page-header wechat">
             <h1>视频号发布任务规则</h1>
             <div class="tagline">
@@ -1331,7 +1277,6 @@
                 <div class="qr-code-section">
                     <div class="section-title">
                         <i class="fas fa-qrcode"></i> 添加视频号客服微信
-                        <span id="wechat-param-info" style="font-size: 14px; color: #666; margin-left: 10px;"></span>
                     </div>
                     <div class="qr-code-container">
                         <div class="qr-code-placeholder" id="wechat-qr-container">
@@ -1363,116 +1308,49 @@
     
     <script>
         // 获取URL参数函数
-        function getUrlParam() {
-            const urlParams = new URLSearchParams(window.location.search);
-            let param = null;
-            
-            // 遍历所有参数，找到第一个数字参数
-            for (const [key, value] of urlParams) {
-                // 如果参数没有键名（如?1），则key是空字符串，value是"1"
-                if (key === '' && /^\d+$/.test(value)) {
-                    param = parseInt(value);
-                    break;
-                }
-                // 或者参数名是数字（如?1=）
-                else if (/^\d+$/.test(key)) {
-                    param = parseInt(key);
-                    break;
-                }
-            }
-            
-            // 如果没有找到参数，检查整个查询字符串
-            if (param === null) {
-                const query = window.location.search.substring(1); // 去掉问号
-                if (/^\d+$/.test(query)) {
-                    param = parseInt(query);
-                }
-            }
+        function getQueryParam() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const param = urlParams.get('') || '1'; // 获取?后面的参数
             
             // 确保参数在1-10之间
-            if (param && param >= 1 && param <= 10) {
-                return param;
+            let taskNumber = parseInt(param);
+            if (isNaN(taskNumber) || taskNumber < 1 || taskNumber > 10) {
+                taskNumber = 1;
             }
             
-            // 默认返回1
-            return 1;
+            return taskNumber;
         }
         
-        // 全局变量存储当前参数
-        let currentParam = getUrlParam();
-        
-        // 显示参数信息
-        function showParamInfo() {
-            const paramDisplay = document.getElementById('param-display');
-            const douyinParamDisplay = document.getElementById('douyin-param-display');
-            const wechatParamDisplay = document.getElementById('wechat-param-display');
+        // 生成二维码URL函数
+        function generateQRUrl(type, taskNumber) {
+            const baseUrl = "http://x.nc0818.top/";
             
-            const currentParamElement = document.getElementById('current-param');
-            const douyinCurrentParam = document.getElementById('douyin-current-param');
-            const wechatCurrentParam = document.getElementById('wechat-current-param');
-            
-            const paramNumberElement = document.getElementById('param-number');
-            const douyinParamNumber = document.getElementById('douyin-param-number');
-            const wechatParamNumber = document.getElementById('wechat-param-number');
-            
-            const douyinQrParamInfo = document.getElementById('douyin-param-info');
-            const wechatQrParamInfo = document.getElementById('wechat-param-info');
-            
-            if (currentParam !== 1) {
-                // 显示参数信息区域
-                paramDisplay.style.display = 'flex';
-                douyinParamDisplay.style.display = 'flex';
-                wechatParamDisplay.style.display = 'flex';
-                
-                // 更新参数显示
-                currentParamElement.textContent = currentParam;
-                douyinCurrentParam.textContent = currentParam;
-                wechatCurrentParam.textContent = currentParam;
-                
-                // 更新参数数字
-                paramNumberElement.textContent = currentParam;
-                douyinParamNumber.textContent = currentParam;
-                wechatParamNumber.textContent = currentParam;
-                
-                // 更新二维码区域的参数信息
-                if (douyinQrParamInfo) {
-                    douyinQrParamInfo.textContent = `(第${currentParam}组二维码)`;
-                }
-                if (wechatQrParamInfo) {
-                    wechatQrParamInfo.textContent = `(第${currentParam}组二维码)`;
-                }
-            } else {
-                // 如果参数是1（默认），隐藏参数信息区域
-                paramDisplay.style.display = 'none';
-                douyinParamDisplay.style.display = 'none';
-                wechatParamDisplay.style.display = 'none';
-                
-                // 清除二维码区域的参数信息
-                if (douyinQrParamInfo) {
-                    douyinQrParamInfo.textContent = '';
-                }
-                if (wechatQrParamInfo) {
-                    wechatQrParamInfo.textContent = '';
-                }
-            }
-        }
-        
-        // 根据参数生成二维码路径
-        function getQRPath(type, param) {
-            // type: 'douyin' 或 'wechat'
-            // param: 1-10
-            
-            let basePath;
             if (type === 'douyin') {
-                // 当参数为1时，路径为dy，其他为dy2、dy3等
-                basePath = param === 1 ? 'dy' : `dy${param}`;
+                // 抖音二维码URL
+                if (taskNumber === 1) {
+                    return baseUrl + "dy/1.jpg";
+                } else if (taskNumber === 10) {
+                    return baseUrl + "dy10/1.jpg";
+                } else {
+                    return baseUrl + "dy" + taskNumber + "/1.jpg";
+                }
             } else if (type === 'wechat') {
-                // 当参数为1时，路径为sph，其他为sph2、sph3等
-                basePath = param === 1 ? 'sph' : `sph${param}`;
+                // 视频号二维码URL
+                if (taskNumber === 1) {
+                    return baseUrl + "sph/1.jpg";
+                } else if (taskNumber === 10) {
+                    return baseUrl + "sph10/1.jpg";
+                } else {
+                    return baseUrl + "sph" + taskNumber + "/1.jpg";
+                }
             }
             
-            return `http://x.nc0818.top/${basePath}/1.jpg`;
+            return "";
         }
+        
+        // 获取任务编号
+        const currentTaskNumber = getQueryParam();
         
         // 页面切换函数
         function showPage(pageId) {
@@ -1509,17 +1387,23 @@
         
         // 初始化页面
         window.onload = function() {
-            // 显示参数信息
-            showParamInfo();
-            
             // 显示导航页
             showPage('navigation-page');
+            
+            // 在页面标题显示当前任务编号
+            if (currentTaskNumber > 1) {
+                document.title = "每日任务领取-任务" + currentTaskNumber + "-从赚小钱开始";
+                const headerTitle = document.querySelector('.navigation-header h1');
+                if (headerTitle) {
+                    headerTitle.innerHTML = `任务选择系统 <span style="font-size: 16px; background: #FFD700; color: #333; padding: 3px 10px; border-radius: 15px; margin-left: 10px;">任务${currentTaskNumber}</span>`;
+                }
+            }
             
             // 为移动端优化触摸体验
             document.addEventListener('touchstart', function() {}, {passive: true});
         };
         
-        // 加载抖音二维码函数（修改为使用参数）
+        // 加载抖音二维码函数
         function loadDouyinQR() {
             const douyinQR = document.getElementById('douyin-qr');
             const douyinLoading = document.getElementById('douyin-qr-loading');
@@ -1530,9 +1414,11 @@
             douyinLoading.style.display = 'flex';
             douyinError.style.display = 'none';
             
-            // 根据参数设置图片源
-            const qrPath = getQRPath('douyin', currentParam);
-            douyinQR.src = qrPath + "?" + new Date().getTime();
+            // 生成动态二维码URL
+            const qrUrl = generateQRUrl('douyin', currentTaskNumber);
+            
+            // 设置图片源
+            douyinQR.src = qrUrl + "?" + new Date().getTime();
             
             // 图片加载成功
             douyinQR.onload = function() {
@@ -1549,7 +1435,7 @@
             };
         }
         
-        // 加载视频号二维码函数（修改为使用参数）
+        // 加载视频号二维码函数
         function loadWechatQR() {
             const wechatQR = document.getElementById('wechat-qr');
             const wechatLoading = document.getElementById('wechat-qr-loading');
@@ -1560,9 +1446,11 @@
             wechatLoading.style.display = 'flex';
             wechatError.style.display = 'none';
             
-            // 根据参数设置图片源
-            const qrPath = getQRPath('wechat', currentParam);
-            wechatQR.src = qrPath + "?" + new Date().getTime();
+            // 生成动态二维码URL
+            const qrUrl = generateQRUrl('wechat', currentTaskNumber);
+            
+            // 设置图片源
+            wechatQR.src = qrUrl + "?" + new Date().getTime();
             
             // 图片加载成功
             wechatQR.onload = function() {
