@@ -38,7 +38,7 @@
         .param-info {
             background: linear-gradient(to right, #4CAF50, #8BC34A);
             color: white;
-            padding: 10px 15px;
+            padding: 8px 15px;
             text-align: center;
             font-size: 14px;
             font-weight: 700;
@@ -46,20 +46,20 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
         }
         
         .param-info i {
-            font-size: 16px;
+            font-size: 14px;
         }
         
         .param-badge {
             background: #FFD700;
             color: #333;
-            padding: 3px 10px;
-            border-radius: 20px;
+            padding: 2px 8px;
+            border-radius: 15px;
             font-weight: 900;
-            margin-left: 5px;
+            margin: 0 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
@@ -856,12 +856,12 @@
     
     <!-- 总导航页 -->
     <div id="navigation-page" class="container">
-        <!-- 新增：URL参数显示区域 -->
-        <div id="param-info-section" class="param-info" style="display: none;">
+        <!-- 新增：参数显示区域 -->
+        <div id="param-display" class="param-info" style="display: none;">
             <i class="fas fa-link"></i>
-            <span>当前链接参数: </span>
+            <span>当前参数:</span>
             <span id="current-param" class="param-badge">1</span>
-            <span id="param-desc">(使用第1组二维码)</span>
+            <span>(使用第<span id="param-number">1</span>组二维码)</span>
         </div>
         
         <div class="navigation-header">
@@ -923,12 +923,12 @@
     
     <!-- 抖音任务页面 -->
     <div id="douyin-page" class="container" style="display: none;">
-        <!-- 新增：URL参数显示区域 -->
-        <div id="douyin-param-info" class="param-info" style="display: none;">
+        <!-- 新增：参数显示区域 -->
+        <div id="douyin-param-display" class="param-info" style="display: none;">
             <i class="fas fa-link"></i>
-            <span>当前链接参数: </span>
+            <span>当前参数:</span>
             <span id="douyin-current-param" class="param-badge">1</span>
-            <span id="douyin-param-desc">(使用第1组二维码)</span>
+            <span>(使用第<span id="douyin-param-number">1</span>组二维码)</span>
         </div>
         
         <div class="page-header">
@@ -1124,7 +1124,7 @@
                 <div class="qr-code-section">
                     <div class="section-title">
                         <i class="fas fa-qrcode"></i> 添加抖音客服微信
-                        <span id="douyin-qr-param-info" style="font-size: 14px; color: #666; margin-left: 10px;"></span>
+                        <span id="douyin-param-info" style="font-size: 14px; color: #666; margin-left: 10px;"></span>
                     </div>
                     <div class="qr-code-container">
                         <div class="qr-code-placeholder" id="douyin-qr-container">
@@ -1156,12 +1156,12 @@
     
     <!-- 视频号任务页面 -->
     <div id="wechat-page" class="container" style="display: none;">
-        <!-- 新增：URL参数显示区域 -->
-        <div id="wechat-param-info" class="param-info" style="display: none;">
+        <!-- 新增：参数显示区域 -->
+        <div id="wechat-param-display" class="param-info" style="display: none;">
             <i class="fas fa-link"></i>
-            <span>当前链接参数: </span>
+            <span>当前参数:</span>
             <span id="wechat-current-param" class="param-badge">1</span>
-            <span id="wechat-param-desc">(使用第1组二维码)</span>
+            <span>(使用第<span id="wechat-param-number">1</span>组二维码)</span>
         </div>
         
         <div class="page-header wechat">
@@ -1331,7 +1331,7 @@
                 <div class="qr-code-section">
                     <div class="section-title">
                         <i class="fas fa-qrcode"></i> 添加视频号客服微信
-                        <span id="wechat-qr-param-info" style="font-size: 14px; color: #666; margin-left: 10px;"></span>
+                        <span id="wechat-param-info" style="font-size: 14px; color: #666; margin-left: 10px;"></span>
                     </div>
                     <div class="qr-code-container">
                         <div class="qr-code-placeholder" id="wechat-qr-container">
@@ -1403,36 +1403,36 @@
         
         // 显示参数信息
         function showParamInfo() {
-            const paramInfo = document.getElementById('param-info-section');
-            const douyinParamInfo = document.getElementById('douyin-param-info');
-            const wechatParamInfo = document.getElementById('wechat-param-info');
+            const paramDisplay = document.getElementById('param-display');
+            const douyinParamDisplay = document.getElementById('douyin-param-display');
+            const wechatParamDisplay = document.getElementById('wechat-param-display');
             
             const currentParamElement = document.getElementById('current-param');
             const douyinCurrentParam = document.getElementById('douyin-current-param');
             const wechatCurrentParam = document.getElementById('wechat-current-param');
             
-            const paramDesc = document.getElementById('param-desc');
-            const douyinParamDesc = document.getElementById('douyin-param-desc');
-            const wechatParamDesc = document.getElementById('wechat-param-desc');
+            const paramNumberElement = document.getElementById('param-number');
+            const douyinParamNumber = document.getElementById('douyin-param-number');
+            const wechatParamNumber = document.getElementById('wechat-param-number');
             
-            const douyinQrParamInfo = document.getElementById('douyin-qr-param-info');
-            const wechatQrParamInfo = document.getElementById('wechat-qr-param-info');
+            const douyinQrParamInfo = document.getElementById('douyin-param-info');
+            const wechatQrParamInfo = document.getElementById('wechat-param-info');
             
             if (currentParam !== 1) {
                 // 显示参数信息区域
-                paramInfo.style.display = 'flex';
-                douyinParamInfo.style.display = 'flex';
-                wechatParamInfo.style.display = 'flex';
+                paramDisplay.style.display = 'flex';
+                douyinParamDisplay.style.display = 'flex';
+                wechatParamDisplay.style.display = 'flex';
                 
                 // 更新参数显示
                 currentParamElement.textContent = currentParam;
                 douyinCurrentParam.textContent = currentParam;
                 wechatCurrentParam.textContent = currentParam;
                 
-                // 更新参数描述
-                paramDesc.textContent = `(使用第${currentParam}组二维码)`;
-                douyinParamDesc.textContent = `(使用第${currentParam}组二维码)`;
-                wechatParamDesc.textContent = `(使用第${currentParam}组二维码)`;
+                // 更新参数数字
+                paramNumberElement.textContent = currentParam;
+                douyinParamNumber.textContent = currentParam;
+                wechatParamNumber.textContent = currentParam;
                 
                 // 更新二维码区域的参数信息
                 if (douyinQrParamInfo) {
@@ -1443,9 +1443,9 @@
                 }
             } else {
                 // 如果参数是1（默认），隐藏参数信息区域
-                paramInfo.style.display = 'none';
-                douyinParamInfo.style.display = 'none';
-                wechatParamInfo.style.display = 'none';
+                paramDisplay.style.display = 'none';
+                douyinParamDisplay.style.display = 'none';
+                wechatParamDisplay.style.display = 'none';
                 
                 // 清除二维码区域的参数信息
                 if (douyinQrParamInfo) {
@@ -1464,8 +1464,10 @@
             
             let basePath;
             if (type === 'douyin') {
+                // 当参数为1时，路径为dy，其他为dy2、dy3等
                 basePath = param === 1 ? 'dy' : `dy${param}`;
             } else if (type === 'wechat') {
+                // 当参数为1时，路径为sph，其他为sph2、sph3等
                 basePath = param === 1 ? 'sph' : `sph${param}`;
             }
             
