@@ -780,6 +780,25 @@
             color: #FF6B35;
         }
         
+        /* 重试按钮 */
+        .retry-button {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+        
         /* 响应式调整 */
         @media (max-width: 360px) {
             .trust-badge {
@@ -1083,7 +1102,7 @@
                     <div class="qr-code-container">
                         <div class="qr-code-placeholder" id="douyin-qr-container">
                             <!-- 抖音客服二维码 -->
-                            <img src="http://x.nc0818.top/dy/1.jpg" alt="抖音客服二维码" id="douyin-qr" style="display: none;">
+                            <img src="" alt="抖音客服二维码" id="douyin-qr" style="display: none;">
                             <div class="qr-loading" id="douyin-qr-loading">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <div>加载二维码中...</div>
@@ -1092,6 +1111,7 @@
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <div>二维码加载失败</div>
                                 <div style="font-size: 12px; margin-top: 5px;">请稍后重试或联系客服</div>
+                                <button class="retry-button" onclick="retryDouyinQR()">重试加载</button>
                             </div>
                         </div>
                         <div class="qr-code-text">
@@ -1281,7 +1301,7 @@
                     <div class="qr-code-container">
                         <div class="qr-code-placeholder" id="wechat-qr-container">
                             <!-- 视频号客服二维码 -->
-                            <img src="http://x.nc0818.top/sph/1.jpg" alt="视频号客服二维码" id="wechat-qr" style="display: none;">
+                            <img src="" alt="视频号客服二维码" id="wechat-qr" style="display: none;">
                             <div class="qr-loading" id="wechat-qr-loading">
                                 <i class="fas fa-spinner fa-spin"></i>
                                 <div>加载二维码中...</div>
@@ -1290,6 +1310,7 @@
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <div>二维码加载失败</div>
                                 <div style="font-size: 12px; margin-top: 5px;">请稍后重试或联系客服</div>
+                                <button class="retry-button" onclick="retryWechatQR()">重试加载</button>
                             </div>
                         </div>
                         <div class="qr-code-text">
@@ -1307,11 +1328,36 @@
     </div>
     
     <script>
+        // 备用图片源配置
+        const backupQRUrls = {
+            douyin: [
+                "https://via.placeholder.com/200x200/FF0000/FFFFFF?text=抖音二维码",
+                "https://via.placeholder.com/200x200/25F4EE/FFFFFF?text=抖音客服"
+            ],
+            wechat: [
+                "https://via.placeholder.com/200x200/07C160/FFFFFF?text=微信二维码",
+                "https://via.placeholder.com/200x200/04A84E/FFFFFF?text=视频号客服"
+            ]
+        };
+        
+        let currentBackupIndex = {
+            douyin: 0,
+            wechat: 0
+        };
+        
         // 获取URL参数函数
         function getQueryParam() {
             const queryString = window.location.search;
             const urlParams = new URLSearchParams(queryString);
-            const param = urlParams.get('') || '1'; // 获取?后面的参数
+            let param = '1';
+            
+            // 尝试获取?后面的参数（无参数名的参数）
+            if (queryString) {
+                param = queryString.substring(1); // 去掉问号
+                if (!param || param === '') {
+                    param = '1';
+                }
+            }
             
             // 确保参数在1-10之间
             let taskNumber = parseInt(param);
@@ -1322,9 +1368,11 @@
             return taskNumber;
         }
         
-        // 生成二维码URL函数
+        // 生成二维码URL函数 - 修复版本
         function generateQRUrl(type, taskNumber) {
             const baseUrl = "http://x.nc0818.top/";
+            
+            console.log(`生成二维码: type=${type}, taskNumber=${taskNumber}`);
             
             if (type === 'douyin') {
                 // 抖音二维码URL
@@ -1387,24 +1435,37 @@
         
         // 初始化页面
         window.onload = function() {
+            console.log("当前任务编号:", currentTaskNumber);
+            console.log("抖音二维码URL:", generateQRUrl('douyin', currentTaskNumber));
+            console.log("视频号二维码URL:", generateQRUrl('wechat', currentTaskNumber));
+            
             // 显示导航页
             showPage('navigation-page');
             
             // 在页面标题显示当前任务编号
             if (currentTaskNumber > 1) {
-                document.title = "每日任务领取-任务" + currentTaskNumber + "-从赚小钱开始";
+                document.title = `每日任务领取-任务${currentTaskNumber}-从赚小钱开始`;
                 const headerTitle = document.querySelector('.navigation-header h1');
                 if (headerTitle) {
-                    headerTitle.innerHTML = `任务选择系统 <span style="font-size: 16px; background: #FFD700; color: #333; padding: 3px 10px; border-radius: 15px; margin-left: 10px;">任务${currentTaskNumber}</span>`;
+                    headerTitle.innerHTML = `任务选择系统 <span style="font-size: 16px; background: #FFD700; color: #333; padding: 3px 10px; border-radius: 15px; margin-left: 10px; display: inline-block;">任务${currentTaskNumber}</span>`;
                 }
             }
             
             // 为移动端优化触摸体验
             document.addEventListener('touchstart', function() {}, {passive: true});
+            
+            // 检查URL参数，如果有直接跳转到相应页面
+            const urlParams = new URLSearchParams(window.location.search);
+            const directPage = urlParams.get('page');
+            if (directPage === 'douyin') {
+                showPage('douyin-page');
+            } else if (directPage === 'wechat') {
+                showPage('wechat-page');
+            }
         };
         
-        // 加载抖音二维码函数
-        function loadDouyinQR() {
+        // 加载抖音二维码函数 - 增强版
+        function loadDouyinQR(useBackup = false) {
             const douyinQR = document.getElementById('douyin-qr');
             const douyinLoading = document.getElementById('douyin-qr-loading');
             const douyinError = document.getElementById('douyin-qr-error');
@@ -1414,29 +1475,90 @@
             douyinLoading.style.display = 'flex';
             douyinError.style.display = 'none';
             
-            // 生成动态二维码URL
-            const qrUrl = generateQRUrl('douyin', currentTaskNumber);
+            let qrUrl;
+            
+            if (useBackup) {
+                // 使用备用图片
+                currentBackupIndex.douyin = (currentBackupIndex.douyin + 1) % backupQRUrls.douyin.length;
+                qrUrl = backupQRUrls.douyin[currentBackupIndex.douyin];
+                console.log("使用备用抖音二维码:", qrUrl);
+            } else {
+                // 生成动态二维码URL
+                qrUrl = generateQRUrl('douyin', currentTaskNumber);
+                console.log("使用主抖音二维码:", qrUrl);
+            }
             
             // 设置图片源
             douyinQR.src = qrUrl + "?" + new Date().getTime();
             
             // 图片加载成功
             douyinQR.onload = function() {
+                console.log("抖音二维码加载成功");
                 douyinQR.style.display = 'block';
                 douyinLoading.style.display = 'none';
                 douyinError.style.display = 'none';
+                
+                // 图片加载成功后显示URL信息（仅用于调试）
+                if (useBackup) {
+                    console.log("已加载备用二维码");
+                }
             };
             
             // 图片加载失败
             douyinQR.onerror = function() {
-                douyinQR.style.display = 'none';
-                douyinLoading.style.display = 'none';
-                douyinError.style.display = 'flex';
+                console.error("抖音二维码加载失败:", qrUrl);
+                
+                if (!useBackup) {
+                    // 第一次加载失败，尝试使用备用图片
+                    console.log("尝试使用备用图片...");
+                    loadDouyinQR(true);
+                } else {
+                    // 备用图片也加载失败
+                    douyinQR.style.display = 'none';
+                    douyinLoading.style.display = 'none';
+                    douyinError.style.display = 'flex';
+                    
+                    // 在错误信息中显示尝试加载的URL
+                    const errorText = douyinError.querySelector('div:nth-child(2)');
+                    if (errorText) {
+                        errorText.textContent = `二维码加载失败 (任务${currentTaskNumber})`;
+                    }
+                    
+                    // 显示尝试的URL
+                    const urlInfo = document.createElement('div');
+                    urlInfo.style.fontSize = '10px';
+                    urlInfo.style.marginTop = '5px';
+                    urlInfo.style.color = '#666';
+                    urlInfo.style.wordBreak = 'break-all';
+                    urlInfo.textContent = `尝试加载: ${qrUrl}`;
+                    
+                    if (!douyinError.querySelector('.url-info')) {
+                        urlInfo.className = 'url-info';
+                        douyinError.appendChild(urlInfo);
+                    }
+                }
             };
+            
+            // 设置超时处理
+            setTimeout(function() {
+                if (douyinQR.style.display === 'none' && douyinLoading.style.display !== 'none') {
+                    console.log("抖音二维码加载超时");
+                    if (!useBackup) {
+                        loadDouyinQR(true);
+                    }
+                }
+            }, 5000);
         }
         
-        // 加载视频号二维码函数
-        function loadWechatQR() {
+        // 重试加载抖音二维码
+        function retryDouyinQR() {
+            console.log("重试加载抖音二维码");
+            currentBackupIndex.douyin = 0; // 重置备用索引
+            loadDouyinQR(false);
+        }
+        
+        // 加载视频号二维码函数 - 增强版
+        function loadWechatQR(useBackup = false) {
             const wechatQR = document.getElementById('wechat-qr');
             const wechatLoading = document.getElementById('wechat-qr-loading');
             const wechatError = document.getElementById('wechat-qr-error');
@@ -1446,25 +1568,86 @@
             wechatLoading.style.display = 'flex';
             wechatError.style.display = 'none';
             
-            // 生成动态二维码URL
-            const qrUrl = generateQRUrl('wechat', currentTaskNumber);
+            let qrUrl;
+            
+            if (useBackup) {
+                // 使用备用图片
+                currentBackupIndex.wechat = (currentBackupIndex.wechat + 1) % backupQRUrls.wechat.length;
+                qrUrl = backupQRUrls.wechat[currentBackupIndex.wechat];
+                console.log("使用备用视频号二维码:", qrUrl);
+            } else {
+                // 生成动态二维码URL
+                qrUrl = generateQRUrl('wechat', currentTaskNumber);
+                console.log("使用主视频号二维码:", qrUrl);
+            }
             
             // 设置图片源
             wechatQR.src = qrUrl + "?" + new Date().getTime();
             
             // 图片加载成功
             wechatQR.onload = function() {
+                console.log("视频号二维码加载成功");
                 wechatQR.style.display = 'block';
                 wechatLoading.style.display = 'none';
                 wechatError.style.display = 'none';
+                
+                // 图片加载成功后显示URL信息（仅用于调试）
+                if (useBackup) {
+                    console.log("已加载备用二维码");
+                }
             };
             
             // 图片加载失败
             wechatQR.onerror = function() {
-                wechatQR.style.display = 'none';
-                wechatLoading.style.display = 'none';
-                wechatError.style.display = 'flex';
+                console.error("视频号二维码加载失败:", qrUrl);
+                
+                if (!useBackup) {
+                    // 第一次加载失败，尝试使用备用图片
+                    console.log("尝试使用备用图片...");
+                    loadWechatQR(true);
+                } else {
+                    // 备用图片也加载失败
+                    wechatQR.style.display = 'none';
+                    wechatLoading.style.display = 'none';
+                    wechatError.style.display = 'flex';
+                    
+                    // 在错误信息中显示尝试加载的URL
+                    const errorText = wechatError.querySelector('div:nth-child(2)');
+                    if (errorText) {
+                        errorText.textContent = `二维码加载失败 (任务${currentTaskNumber})`;
+                    }
+                    
+                    // 显示尝试的URL
+                    const urlInfo = document.createElement('div');
+                    urlInfo.style.fontSize = '10px';
+                    urlInfo.style.marginTop = '5px';
+                    urlInfo.style.color = '#666';
+                    urlInfo.style.wordBreak = 'break-all';
+                    urlInfo.textContent = `尝试加载: ${qrUrl}`;
+                    
+                    if (!wechatError.querySelector('.url-info')) {
+                        urlInfo.className = 'url-info';
+                        wechatError.appendChild(urlInfo);
+                    }
+                }
             };
+            
+            // 设置超时处理
+            setTimeout(function() {
+                if (wechatQR.style.display === 'none' && wechatLoading.style.display !== 'none') {
+                    console.log("视频号二维码加载超时");
+                    if (!useBackup) {
+                        loadWechatQR(true);
+                    }
+                }
+            }, 5000);
+        }
+        
+        // 重试加载视频号二维码
+        function retryWechatQR() {
+            console.log("重试加载视频号二维码");
+            currentBackupIndex.wechat = 0; // 重置备用索引
+            loadWechatQR(false);
         }
         
         // 设置步骤动画
@@ -1555,6 +1738,22 @@
         window.addEventListener('resize', setAppHeight);
         window.addEventListener('orientationchange', setAppHeight);
         setAppHeight();
+        
+        // 添加直接访问功能
+        // 可以通过URL参数直接访问特定页面
+        // 例如：?1&page=douyin 或 ?1&page=wechat
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageParam = urlParams.get('page');
+        
+        if (pageParam === 'douyin') {
+            setTimeout(() => {
+                showPage('douyin-page');
+            }, 100);
+        } else if (pageParam === 'wechat') {
+            setTimeout(() => {
+                showPage('wechat-page');
+            }, 100);
+        }
     </script>
 </body>
 </html>
